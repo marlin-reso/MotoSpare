@@ -1,0 +1,2 @@
+import type {Order} from "../../types";
+export const mockOrders:Order[]=[{id:"ORD-1024",buyer:"Demo Buyer",seller:"Rider's Garage",items:"CBR250R Tail Light",amount:1899,status:"Processing"},{id:"ORD-1023",buyer:"Demo Buyer",seller:"MotoWorks India",items:"Front Disc Rotor",amount:2490,status:"Shipped"},{id:"ORD-1022",buyer:"Demo Buyer",seller:"Speed Parts Hub",items:"Gear Lever",amount:799,status:"Delivered"}];
