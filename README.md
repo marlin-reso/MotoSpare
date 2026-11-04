@@ -72,3 +72,23 @@ where user_id = 'SELLER_AUTH_USER_UUID';
 
 Product listings remain pending approval and do not appear publicly until an admin changes their `products.status` to `active`. Admin workflows are not yet available in the UI.
 \nIf you already applied the earlier schema version, also run `supabase/migrations/20261104_seller_listing_delete.sql` in Supabase SQL Editor to update the seller-owned delete policy.\n
+## Priority 2 — Buyer Marketplace
+
+This implementation adds cart persistence in browser local storage, delivery-address checkout, buyer order history, and order creation through a Supabase RPC. The RPC calculates item prices from active database products and locks/decrements stock atomically; checkout does not submit a client-authoritative price. Payment gateway and shipping-charge calculation are not included yet; created orders remain `pending`.
+
+### Apply Priority 2 database migration
+
+After applying the base `supabase/schema.sql` and Priority 1 migrations, run this file in Supabase Dashboard → SQL Editor:
+
+`supabase/migrations/20261104_priority2_buyer_marketplace.sql`
+
+Then configure `.env` with your Supabase project URL and anon key, run `npm install`, and `npm run dev`. Sign in as a buyer before placing an order. Order history is available from Account → My Orders.
+
+### Buyer marketplace scope
+
+- Cart: quantity changes/removal and persisted cart state.
+- Checkout: delivery form, basic phone/PIN validation, order summary, pending order confirmation.
+- Orders: buyer-owned order history and line items.
+- Catalog: existing product search, brand/category filters and category navigation.
+
+Note: apply the SQL migration to Supabase for checkout to work. Local demo products without Supabase are browseable, but order placement requires Supabase and authenticated database product rows.
