@@ -35,3 +35,40 @@ npm run build
 
 ## Not yet connected
 This is a frontend prototype with mock data. Real backend/database persistence, OTP/authentication, seller approval enforcement, server-side role checks, payment gateway, shipping integration, notifications, and secure file uploads must be implemented in backend. No secrets are embedded.
+
+
+## Supabase backend scaffold
+
+The project now includes Supabase client wiring, authentication helpers, database-backed product reads (with demo-data fallback when Supabase env vars are absent), seller listing creation, buyer order creation/listing, and an initial schema with RLS policies.
+
+### Configure Supabase
+1. Create a project at https://supabase.com/.
+2. In Supabase Dashboard → SQL Editor, run `supabase/schema.sql`.
+3. Copy the Project URL and anon/public key from Project Settings → API.
+4. Copy `.env.example` to `.env` and fill:
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_ANON_KEY`
+5. Install and start:
+```bash
+npm install
+npm run dev
+```
+
+### Important implementation notes
+- The Supabase anon key is designed for client use only when RLS is enabled. Never add the `service_role` key to frontend env variables.
+- Admin role is not selectable during public registration. Grant it only to a verified account using the SQL example in `supabase/schema.sql`.
+- Seller listings require seller account approval before insert; admins can approve/reject using trusted dashboard or future admin backend actions.
+- Payment capture, server-validated inventory/price, shipping integration, storage bucket policies, admin UI workflows, and production checkout are not yet implemented.
+- The current page components still contain prototype auth/dashboard behavior; the service layer is prepared, but the UI needs wiring to these service functions in a follow-on step.
+
+### Seller approval for development/testing
+A new seller is created with `approval_status = 'pending'`. After reviewing the account, a trusted admin can approve the seller in Supabase SQL Editor, substituting the authenticated user's UUID:
+
+```sql
+update public.seller_profiles
+set approval_status = 'approved'
+where user_id = 'SELLER_AUTH_USER_UUID';
+```
+
+Product listings remain pending approval and do not appear publicly until an admin changes their `products.status` to `active`. Admin workflows are not yet available in the UI.
+\nIf you already applied the earlier schema version, also run `supabase/migrations/20261104_seller_listing_delete.sql` in Supabase SQL Editor to update the seller-owned delete policy.\n
